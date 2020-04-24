@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="node_modules/qrcode/build/qrcode.min.js"></script>
+    <script src="node_modules/qrcode/build/qrcode.tosjis.min.js"></script>
+
+    <title>KKKB สร้าง QR Code รับชำระเงินชั่วคร่าว</title>
+</head>
+
+<body>
+    <h1>KKKB สร้าง QR Code รับชำระเงินชั่วคร่าว</h1>
+    <form action="#" onsubmit="genqrcode()">
+        เลขสัญญา (ห้ามมีเครื่องหมาย -):
+        <input type="text" id="policyNo" />
+        <br />
+        จำนวนเงิน:
+        <input type="number" id="amount" />
+        <br>
+        <input type="submit" value="สร้าง QR Code" />
+        <br>
+        <div style="padding:30px">
+            <canvas id="canvas"></canvas>
+        </div>
+    </form>
+</body>
+
+<script>
+    function genqrcode() {
+        const policyNo = document.getElementById('policyNo').value;
+        if (!policyNo) {
+            return alert('ป้อนเลขสัญญา')
+        }
+
+        const haveMinus = policyNo.toString().indexOf('-') !== -1;
+        if (haveMinus) {
+            return alert('เลขสัญญาห้ามมีเครื่องหมาย -')
+        }
+
+        let amount = document.getElementById('amount').value;
+        if (!amount) {
+            return alert('ป้อนจำนวนเงิน')
+        }
+
+        const havedot = amount.toString().indexOf('.') !== -1;
+        if (havedot) {
+            amount = amount.toString().replace('.', '');
+        } else {
+            amount = `${amount.toString()}00`;
+        }
+
+        const d = new Date();
+        const date = d.getTime();
+
+        console.log(policyNo, amount);
+        const taxId = '0355559000377';
+        const text = `|${taxId}00\n${policyNo}\n${date}\n${amount}\n|`;
+
+//         const qrurl = `https://chart.googleapis.com/chart?cht=qr&chs=300x300&choe=UTF-8
+
+// &chl=${text}`;
+
+        QRCode.toCanvas(document.getElementById('canvas'), text, { errorCorrectionLevel: 'H' }, function (error) {
+            if (error) console.error(error)
+            console.log('success!');
+        })
+
+        // fetch(qrurl)
+        //     .then((response) => {
+        //         response.arrayBuffer().then((buffer) => {
+        //             var base64Flag = 'data:image/jpeg;base64,';
+        //             var imageStr = arrayBufferToBase64(buffer);
+
+        //             document.getElementById('qrcode').src = base64Flag + imageStr;
+        //         });
+        //     })
+        //     .catch((error) => {
+        //         console.log(error);
+        //     });
+    }
+
+    function arrayBufferToBase64(buffer) {
+        var binary = '';
+        var bytes = [].slice.call(new Uint8Array(buffer));
+
+        bytes.forEach((b) => binary += String.fromCharCode(b));
+
+        return window.btoa(binary);
+    };
+</script>
+
+</html>
